@@ -280,8 +280,7 @@ export const RemultAdapter: (args: {
       {
         get: (target, prop, receiver) => {
           return async (...args1) => {
-            console.log(prop, args1)
-            withRemult(
+            return withRemult(
               async () => {
                 return await target[prop](...args1)
               },

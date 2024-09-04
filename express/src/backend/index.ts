@@ -8,6 +8,8 @@ import Credentials from '@auth/express/providers/credentials'
 import { config } from 'dotenv'
 import { AuthController } from '../shared/AuthController'
 import { RemultAdapter } from '../../auth-adapter/index.js'
+import GitHub from '@auth/express/providers/github'
+
 config()
 export const app = express()
 app.set('trust proxy', true)
@@ -17,36 +19,12 @@ const { adapter } = RemultAdapter({ dataProvider })
 const validUsers = ['Jane', 'Alex']
 const authConfig: AuthConfig = {
   adapter,
-  session: {
-    strategy: 'database',
-  },
-  providers: [
-    Credentials({
-      credentials: {
-        name: {
-          placeholder: 'Try ' + validUsers.join(' or '),
-        },
-      },
-      authorize: (credentials) => {
-        const name = credentials.name as string
-        return validUsers.includes(name)
-          ? {
-              id: name,
-              name,
-            }
-          : null
-      },
-    }),
-  ],
+  providers: [GitHub],
   callbacks: {
     session: ({ session, user }) => {
-      user = user ?? session.user
       const result = {
         ...session,
-        user: {
-          id: user?.name!,
-          name: user?.name!,
-        },
+        user,
       }
       return result
     },
