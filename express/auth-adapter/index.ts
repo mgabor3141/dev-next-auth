@@ -6,14 +6,14 @@ import type {
   AdapterSession,
   AdapterAuthenticator,
 } from '@auth/core/adapters'
-import { ClassType, repo, withRemult, type DataProvider } from 'remult'
+import { ClassType, remult, repo, withRemult, type DataProvider } from 'remult'
 import {
   Account as local_Account,
   Authenticator as local_Authenticator,
   Session as local_Session,
   User as local_User,
   VerificationToken as local_VerificationToken,
-} from './entities.js'
+} from './entities'
 
 import type {
   Account as TAccount,
@@ -21,7 +21,7 @@ import type {
   Session as TSession,
   User as TUser,
   VerificationToken,
-} from './entities.js'
+} from './entities'
 
 const toAdapterUser: (u?: TUser) => AdapterUser | null = (u) => {
   if (u) {
@@ -97,6 +97,12 @@ export const RemultAdapter: (args: {
     | DataProvider
     | Promise<DataProvider>
     | (() => Promise<DataProvider | undefined>)
+  /** Will create tables and columns in supporting databases. default: true
+   *
+   * @description
+   * when set to true, it'll create entities that do not exist, and add columns that are missing.
+   */
+  ensureSchema?: boolean
   customEntities?: {
     Account?: ClassType<TAccount>
     Authenticator?: ClassType<TAuthenticator>
@@ -115,14 +121,10 @@ export const RemultAdapter: (args: {
   //   args?.customEntities?.VerificationToken ?? local_VerificationToken
   const VerificationToken = local_VerificationToken
 
+  let executeEnsureSchema = args.ensureSchema ?? true
+
+  const entities = [Account, Authenticator, Session, User, VerificationToken]
   return {
-    entities: {
-      Account,
-      Authenticator,
-      Session,
-      User,
-      VerificationToken,
-    },
     adapter: new Proxy(
       {
         async createVerificationToken(verificationToken) {
@@ -282,6 +284,11 @@ export const RemultAdapter: (args: {
           return async (...args1) => {
             return withRemult(
               async () => {
+                if (executeEnsureSchema) {
+                  await remult.dataProvider.ensureSchema?.(
+                    entities.map((x) => remult.repo(x as any).metadata)
+                  )
+                }
                 return await target[prop](...args1)
               },
               { dataProvider: args.dataProvider }
