@@ -7,7 +7,7 @@ import { JsonFileDataProvider } from 'remult/server'
 import Credentials from '@auth/express/providers/credentials'
 import { config } from 'dotenv'
 import { AuthController } from '../shared/AuthController'
-import { RemultAdapter } from '../../auth-adapter/index.js'
+import { RemultAdapter } from '../../../auth-adapter/src/index'
 import GitHub from '@auth/express/providers/github'
 
 config()

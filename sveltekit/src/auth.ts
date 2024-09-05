@@ -1,7 +1,7 @@
 import { SvelteKitAuth } from '@auth/sveltekit';
 import GitHub from '@auth/sveltekit/providers/github';
 import { JsonFileDataProvider } from 'remult/server';
-import { RemultAdapter } from '../auth-adapter';
+import { RemultAdapter } from '../../auth-adapter/src/index';
 
 const dataProvider = new JsonFileDataProvider('db');
 const { adapter } = RemultAdapter({ dataProvider });

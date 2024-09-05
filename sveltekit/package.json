@@ -25,6 +25,6 @@
 	"type": "module",
 	"dependencies": {
 		"@auth/sveltekit": "^1.4.2",
-		"remult": "^0.27.11"
+		"remult": "^0.27.12"
 	}
 }

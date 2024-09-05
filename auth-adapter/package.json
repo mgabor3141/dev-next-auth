@@ -1,0 +1,15 @@
+{
+  "name": "auth-adapter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@auth/core": "^0.34.2",
+    "remult": "^0.27.12"
+  }
+}

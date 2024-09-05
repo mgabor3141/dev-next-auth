@@ -1,8 +1,0 @@
-{
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "paths": {
-      "remult": ["../express/node_modules/remult/index.d.ts"]
-    }
-  }
-}

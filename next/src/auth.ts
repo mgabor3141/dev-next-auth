@@ -2,7 +2,7 @@ import NextAuth from 'next-auth'
 
 import GitHub from 'next-auth/providers/github'
 import { JsonFileDataProvider } from 'remult/server'
-import { RemultAdapter } from '../auth-adapter'
+import { RemultAdapter } from '../../auth-adapter/src/index'
 const dataProvider = new JsonFileDataProvider('db')
 const { adapter } = RemultAdapter({ dataProvider })
 

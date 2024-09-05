@@ -13,7 +13,7 @@ import {
   Session as local_Session,
   User as local_User,
   VerificationToken as local_VerificationToken,
-} from './entities.js'
+} from './entities'
 
 import type {
   Account as TAccount,
@@ -21,7 +21,7 @@ import type {
   Session as TSession,
   User as TUser,
   VerificationToken,
-} from './entities.js'
+} from './entities'
 
 const toAdapterUser: (u?: TUser) => AdapterUser | null = (u) => {
   if (u) {
@@ -123,20 +123,14 @@ export const RemultAdapter: (args: {
       User,
       VerificationToken,
     },
-    adapter: new Proxy(
+    adapter: new Proxy<Adapter>(
       {
         async createVerificationToken(verificationToken) {
           return toVerificationToken(
             await repo(VerificationToken).insert(verificationToken)
           )
         },
-        async useVerificationToken({
-          identifier,
-          token,
-        }: {
-          identifier: string
-          token: string
-        }) {
+        async useVerificationToken({ identifier, token }) {
           const v = await repo(VerificationToken).findFirst({
             identifier,
             token,
@@ -157,10 +151,7 @@ export const RemultAdapter: (args: {
         async getUserByEmail(email) {
           return toAdapterUser(await repo(User).findFirst({ email }))
         },
-        async getUserByAccount({
-          providerAccountId,
-          provider,
-        }): Promise<AdapterUser | null> {
+        async getUserByAccount({ providerAccountId, provider }) {
           const a = await repo(Account).findFirst(
             { provider, providerAccountId }
             // { include: { user: true } }
@@ -185,8 +176,7 @@ export const RemultAdapter: (args: {
           }
           return await repo(Session).insert({ sessionToken, userId, expires })
         },
-
-        async getSessionAndUser(sessionToken: string | undefined): Promise<{
+        async getSessionAndUser(sessionToken): Promise<{
           session: AdapterSession
           user: AdapterUser
         } | null> {
@@ -242,7 +232,7 @@ export const RemultAdapter: (args: {
             where: { provider, providerAccountId },
           })
         },
-        async deleteUser(userId: string) {
+        async deleteUser(userId) {
           await repo(User).delete({ id: userId })
           await repo(Session).deleteMany({ where: { userId } })
           await repo(Account).deleteMany({ where: { userId } })
@@ -278,8 +268,8 @@ export const RemultAdapter: (args: {
         },
       },
       {
-        get: (target, prop, receiver) => {
-          return async (...args1) => {
+        get: (target: any, prop: string, receiver) => {
+          return async (...args1: any[]) => {
             return withRemult(
               async () => {
                 return await target[prop](...args1)
