@@ -279,7 +279,9 @@ export const RemultAdapter: (args: {
                     entities.map((x) => remult.repo(x as any).metadata)
                   )
                 }
-                return await target[prop](...args1)
+                if (target[prop]) {
+                  return await target[prop](...args1)
+                }
               },
               { dataProvider: args.dataProvider }
             )
