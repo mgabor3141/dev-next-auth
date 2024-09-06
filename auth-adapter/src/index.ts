@@ -6,7 +6,7 @@ import type {
   AdapterSession,
   AdapterAuthenticator,
 } from '@auth/core/adapters'
-import { ClassType, repo, withRemult, type DataProvider } from 'remult'
+import { ClassType, remult, repo, withRemult, type DataProvider } from 'remult'
 import {
   Account as local_Account,
   Authenticator as local_Authenticator,
@@ -97,6 +97,12 @@ export const RemultAdapter: (args: {
     | DataProvider
     | Promise<DataProvider>
     | (() => Promise<DataProvider | undefined>)
+  /** Will create tables and columns in supporting databases. default: true
+   *
+   * @description
+   * when set to true, it'll create entities that do not exist, and add columns that are missing.
+   */
+  ensureSchema?: boolean
   customEntities?: {
     Account?: ClassType<TAccount>
     Authenticator?: ClassType<TAuthenticator>
@@ -115,15 +121,11 @@ export const RemultAdapter: (args: {
   //   args?.customEntities?.VerificationToken ?? local_VerificationToken
   const VerificationToken = local_VerificationToken
 
+  let executeEnsureSchema = args.ensureSchema ?? true
+
+  const entities = [Account, Authenticator, Session, User, VerificationToken]
   return {
-    entities: {
-      Account,
-      Authenticator,
-      Session,
-      User,
-      VerificationToken,
-    },
-    adapter: new Proxy<Adapter>(
+    adapter: new Proxy(
       {
         async createVerificationToken(verificationToken) {
           return toVerificationToken(
@@ -272,6 +274,11 @@ export const RemultAdapter: (args: {
           return async (...args1: any[]) => {
             return withRemult(
               async () => {
+                if (executeEnsureSchema) {
+                  await remult.dataProvider.ensureSchema?.(
+                    entities.map((x) => remult.repo(x as any).metadata)
+                  )
+                }
                 return await target[prop](...args1)
               },
               { dataProvider: args.dataProvider }
