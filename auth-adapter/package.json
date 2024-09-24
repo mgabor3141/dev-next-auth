@@ -10,6 +10,6 @@
   "description": "",
   "dependencies": {
     "@auth/core": "^0.34.2",
-    "remult": "^0.27.12"
+    "remult": "^0.27.17"
   }
 }
