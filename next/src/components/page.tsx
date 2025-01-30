@@ -1,24 +1,18 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { remult, type UserInfo } from 'remult'
-import { AuthController } from '../shared/AuthController'
+import { auth, signIn } from '@/auth'
+import { remult } from 'remult'
+import { User } from '../../../auth-adapter/src/entities'
 
-export function Page() {
-  const [currentUser, _setCurrentUser] = useState<UserInfo>()
+export async function Page() {
+  const c = await remult.repo(User).count()
 
-  function setCurrentUser(user: UserInfo | undefined) {
-    _setCurrentUser(user)
-    remult.user = user
+  const session = await auth()
+  if (!session) {
+    await signIn()
+    return
   }
-  useEffect(() => {
-    AuthController.currentUser().then(setCurrentUser)
-  }, [])
-  if (!currentUser)
-    return (
-      <a type="button" href="/api/auth/signin">
-        Sign In
-      </a>
-    )
+
+  const currentUser = session.user
+
   return (
     <div>
       <center>
